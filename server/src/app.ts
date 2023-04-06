@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth";
 import productRoutes from "./routes/product";
+import categoryRoutes from "./routes/category";
 import { authMiddleware } from "./middleware/auth";
 
 export const app = express();
@@ -10,3 +11,4 @@ app.use(cors());
 
 app.use("/auth", authRoutes);
 app.use("/product", authMiddleware, productRoutes);
+app.use("/category", authMiddleware, categoryRoutes);
