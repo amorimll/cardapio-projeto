@@ -35,13 +35,18 @@ export const getOneProduct = async (req: Request, res: Response) => {
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const { id, categories, name, qty, price } = req.body;
+    let productCategories: any = []
 
-    let productCategories: any = [];
+    if (!id || !categories || !name || !qty || !price) {
+      return res.status(400).send({ Error: "Missing required fields" });
+    }
 
     for (let i = 0; i < categories.length; i++) {
       const category = await Category.findOne({ id: categories[i] });
-      if (category) {
-        productCategories.push(category._id);
+      if (!category) {
+        return res.status(400).send({ Error: "This category does not exist." });
+      } else {
+        productCategories.push(category.name);
       }
     }
 
@@ -67,12 +72,18 @@ export const updateProduct = async (req: Request, res: Response) => {
 
     const { categories, name, qty, price } = req.body;
 
-    let productCategories: any = [];
+    if (!categories || !name || !qty || !price) {
+      return res.status(400).send({ Error: "Missing required fields" });
+    }
+
+    let productCategories: any = []
 
     for (let i = 0; i < categories.length; i++) {
       const category = await Category.findOne({ id: categories[i] });
-      if (category) {
-        productCategories.push(category._id);
+      if (!category) {
+        return res.status(400).send({ Error: "This category doesn't exist." });
+      } else {
+        productCategories.push(category.name);
       }
     }
 
@@ -89,7 +100,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       );
 
     if (!updatedProduct) {
-      return res.status(404).send({ Error: "Product not found" });
+      return res.status(404).send({ Error: "No product found" });
     }
 
     return res.status(200).send(updatedProduct);
@@ -106,7 +117,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
       await Product.findOneAndDelete({ id });
 
     if (!deletedProduct) {
-      return res.status(404).send({ Error: "Product not found" });
+      return res.status(404).send({ Error: "No product found" });
     }
 
     return res.status(200).send({ message: "Product successfully deleted" });
