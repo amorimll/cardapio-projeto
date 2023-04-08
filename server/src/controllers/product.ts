@@ -9,12 +9,12 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const products: ProductDocument[] = await Product.find();
 
     if (products.length < 1) {
-      return res.status(404).send({ Error: "No products found" });
+      return res.status(404).send({ errorMessage: "No products found" });
     }
 
     return res.status(200).send(products);
   } catch (err: any) {
-    return res.status(400).send({ Error: `Failed to get products, ${err.message}` });
+    return res.status(400).send({ errorMessage: `Failed to get products, ${err.message}` });
   }
 };
 
@@ -27,16 +27,16 @@ export const getOneProduct = async (req: Request, res: Response) => {
     const product = await Product.findOne({ id });
 
     if (!errors.isEmpty()) {
-      return res.status(400).send({ Error: errors.array()[0].msg });
+      return res.status(400).send({ errorMessage: errors.array()[0].msg });
     }
 
     if (!product) {
-      return res.status(404).send({ Error: "No product found" });
+      return res.status(404).send({ errorMessage: "No product found" });
     }
 
     return res.status(200).send(product);
   } catch (err: any) {
-    return res.status(400).send({ Error: `Failed to get product, ${err.message}`});
+    return res.status(400).send({ errorMessage: `Failed to get product, ${err.message}`});
   }
 };
 
@@ -47,13 +47,13 @@ export const createProduct = async (req: Request, res: Response) => {
     let productCategories: string[] = [];
 
     if (!errors.isEmpty()) {
-      return res.status(400).json({ Error: errors.array()[0].msg });
+      return res.status(400).json({ errorMessage: errors.array()[0].msg });
     }
 
     for (let i = 0; i < categories.length; i++) {
       const category = await Category.findOne({ id: categories[i] });
       if (!category) {
-        return res.status(404).send({ Error: "This category does not exist." });
+        return res.status(404).send({ errorMessage: "This category does not exist." });
       } else {
         productCategories.push(category.name);
       }
@@ -69,9 +69,9 @@ export const createProduct = async (req: Request, res: Response) => {
 
     await product.save();
 
-    return res.status(200).send({ Message: "Product successfully created." });
+    return res.status(200).send({ responseMessage: "Product successfully created." });
   } catch (err: any) {
-    return res.status(400).send({ Error: `Failed to create product, ${err.message}.` });
+    return res.status(400).send({ errorMessage: `Failed to create product, ${err.message}.` });
   }
 };
 
@@ -84,7 +84,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(400).json({ Error: errors.array()[0].msg });
+      return res.status(400).json({ errorMessage: errors.array()[0].msg });
     }
 
     let productCategories: string[] = [];
@@ -92,7 +92,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     for (let i = 0; i < categories.length; i++) {
       const category = await Category.findOne({ id: categories[i] });
       if (!category) {
-        return res.status(404).send({ Error: "This category does not exist." });
+        return res.status(404).send({ errorMessage: "This category does not exist." });
       } else {
         productCategories.push(category.name);
       }
@@ -111,12 +111,12 @@ export const updateProduct = async (req: Request, res: Response) => {
       );
 
     if (!updatedProduct) {
-      return res.status(404).send({ Error: "No product found" });
+      return res.status(404).send({ errorMessage: "No product found" });
     }
 
-    return res.status(200).send({ Message: "Product successfully updated." });
+    return res.status(200).send({ responseMessage: "Product successfully updated." });
   } catch (err: any) {
-    return res.status(400).send({ Error: `Failed to update product, ${err.message}` });
+    return res.status(400).send({ errorMessage: `Failed to update product, ${err.message}` });
   }
 };
 
@@ -128,18 +128,18 @@ export const deleteProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     if (!errors.isEmpty()) {
-      return res.status(400).send({ Error: errors.array()[0].msg });
+      return res.status(400).send({ errorMessage: errors.array()[0].msg });
     }
 
     const deletedProduct: ProductDocument | null =
       await Product.findOneAndDelete({ id });
 
     if (!deletedProduct) {
-      return res.status(404).send({ Error: "No product found" });
+      return res.status(404).send({ errorMessage: "No product found" });
     }
 
-    return res.status(200).send({ Message: "Product successfully deleted." });
+    return res.status(200).send({ responseMessage: "Product successfully deleted." });
   } catch (err: any) {
-    return res.status(400).send({ Error: `Failed to delete product, ${err.message}.` });
+    return res.status(400).send({ errorMessage: `Failed to delete product, ${err.message}.` });
   }
 };
