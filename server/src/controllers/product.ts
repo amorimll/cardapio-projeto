@@ -8,7 +8,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const products: ProductDocument[] = await Product.find();
 
     if (products.length < 1) {
-      return res.status(200).send({ Error: "No products found" });
+      return res.status(404).send({ Error: "No products found" });
     }
 
     return res.status(200).send(products);
@@ -35,7 +35,7 @@ export const getOneProduct = async (req: Request, res: Response) => {
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const { id, categories, name, qty, price } = req.body;
-    let productCategories: any = []
+    let productCategories: any = [];
 
     if (!id || !categories || !name || !qty || !price) {
       return res.status(400).send({ Error: "Missing required fields" });
@@ -44,7 +44,7 @@ export const createProduct = async (req: Request, res: Response) => {
     for (let i = 0; i < categories.length; i++) {
       const category = await Category.findOne({ id: categories[i] });
       if (!category) {
-        return res.status(400).send({ Error: "This category does not exist." });
+        return res.status(404).send({ Error: "This category does not exist." });
       } else {
         productCategories.push(category.name);
       }
@@ -76,12 +76,12 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).send({ Error: "Missing required fields" });
     }
 
-    let productCategories: any = []
+    let productCategories: any = [];
 
     for (let i = 0; i < categories.length; i++) {
       const category = await Category.findOne({ id: categories[i] });
       if (!category) {
-        return res.status(400).send({ Error: "This category doesn't exist." });
+        return res.status(404).send({ Error: "This category does not exist." });
       } else {
         productCategories.push(category.name);
       }
