@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Product from "../models/Product";
 import Category from "../models/Category";
 import { ProductDocument } from "../@types/IProduct";
+import { check, validationResult } from "express-validator";
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
@@ -13,32 +14,40 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
     return res.status(200).send(products);
   } catch (err: any) {
-    return res.status(400).send({ Error: err.message });
+    return res.status(400).send({ Error: `Failed to get products, ${err.message}` });
   }
 };
 
 export const getOneProduct = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    await check("id").notEmpty().isNumeric().withMessage("ID must be number").run(req);
+
+    const errors = validationResult(req);
+    const { id } = req.params;
     const product = await Product.findOne({ id });
 
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ Error: errors.array()[0].msg });
+    }
+
     if (!product) {
-      return res.status(200).send({ Error: "No product found" });
+      return res.status(404).send({ Error: "No product found" });
     }
 
     return res.status(200).send(product);
   } catch (err: any) {
-    return res.status(400).send({ Error: err.message });
+    return res.status(400).send({ Error: `Failed to get product, ${err.message}`});
   }
 };
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
+    const errors = validationResult(req);
     const { id, categories, name, qty, price } = req.body;
     let productCategories: any = [];
 
-    if (!id || !categories || !name || !qty || !price) {
-      return res.status(400).send({ Error: "Missing required fields" });
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ Error: errors.array()[0].msg });
     }
 
     for (let i = 0; i < categories.length; i++) {
@@ -58,22 +67,24 @@ export const createProduct = async (req: Request, res: Response) => {
       price,
     });
 
-    const productSave = await product.save();
+    await product.save();
 
-    return res.status(201).send(productSave);
+    return res.status(200).send({ Message: "Product successfully created." });
   } catch (err: any) {
-    return res.status(400).send({ Error: err.message });
+    return res.status(400).send({ Error: `Failed to create product, ${err.message}.` });
   }
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
+    await check("id").notEmpty().isNumeric().withMessage("ID must be number").run(req);
+
     const { id } = req.params;
-
     const { categories, name, qty, price } = req.body;
+    const errors = validationResult(req);
 
-    if (!categories || !name || !qty || !price) {
-      return res.status(400).send({ Error: "Missing required fields" });
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ Error: errors.array()[0].msg });
     }
 
     let productCategories: any = [];
@@ -103,15 +114,22 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(404).send({ Error: "No product found" });
     }
 
-    return res.status(200).send(updatedProduct);
+    return res.status(200).send({ Message: "Product successfully updated." });
   } catch (err: any) {
-    return res.status(400).send({ Error: err.message });
+    return res.status(400).send({ Error: `Failed to update product, ${err.message}` });
   }
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
+    await check("id").notEmpty().isNumeric().withMessage("ID must be number").run(req);
+
+    const errors = validationResult(req);
     const { id } = req.params;
+
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ Error: errors.array()[0].msg });
+    }
 
     const deletedProduct: ProductDocument | null =
       await Product.findOneAndDelete({ id });
@@ -120,8 +138,8 @@ export const deleteProduct = async (req: Request, res: Response) => {
       return res.status(404).send({ Error: "No product found" });
     }
 
-    return res.status(200).send({ message: "Product successfully deleted" });
+    return res.status(200).send({ Message: "Product successfully deleted." });
   } catch (err: any) {
-    return res.status(400).send({ Error: err.message });
+    return res.status(400).send({ Error: `Failed to delete product, ${err.message}.` });
   }
 };
