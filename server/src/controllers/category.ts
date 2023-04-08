@@ -10,11 +10,12 @@ export const createCategory = async (req: Request, res: Response) => {
       parent,
       name,
     });
-    const categorySave = await category.save();
+    
+    await category.save();
 
-    return res.status(201).send(categorySave);
+    return res.status(201).send({ responseMessage: "Product successfully created." });
   } catch (err: any) {
-    return res.status(400).send({ Error: err.message });
+    return res.status(400).send({ errorMessage: `Failed to create category, ${err.message}` });
   }
 };
 
@@ -23,6 +24,6 @@ export const getAllCategories = async (req: Request, res: Response) => {
     const category: CategoryDocument[] = await Category.find();
     return res.status(200).send(category);
   } catch (err: any) {
-    return res.status(400).send({ Error: err.message });
+    return res.status(400).send({ errorMessage: `Failed to get categories, ${err.message}` });
   }
 };

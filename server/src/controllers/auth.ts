@@ -18,6 +18,6 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     return res.status(200).json({ token });
   } catch (error) {
     console.error("Error generating login token", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ errorMessage: "Internal server error" });
   }
 };

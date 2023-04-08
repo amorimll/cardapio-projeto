@@ -13,7 +13,7 @@ export const authMiddleware = (req: UserRequest, res: Response, next: NextFuncti
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {
-    return res.status(401).json({ message: 'Authorization denied. Token is required.' });
+    return res.status(401).json({ errorMessage: 'Authorization denied. Token is required.' });
   }
 
   try {
@@ -22,6 +22,6 @@ export const authMiddleware = (req: UserRequest, res: Response, next: NextFuncti
     req.user = verified;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Authorization denied. Token is invalid.' });
+    res.status(401).json({ errorMessage: 'Authorization denied. Token is invalid.' });
   }
 };
