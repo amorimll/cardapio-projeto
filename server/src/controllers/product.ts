@@ -44,7 +44,7 @@ export const createProduct = async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     const { id, categories, name, qty, price } = req.body;
-    let productCategories: any = [];
+    let productCategories: string[] = [];
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ Error: errors.array()[0].msg });
@@ -87,7 +87,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ Error: errors.array()[0].msg });
     }
 
-    let productCategories: any = [];
+    let productCategories: string[] = [];
 
     for (let i = 0; i < categories.length; i++) {
       const category = await Category.findOne({ id: categories[i] });
