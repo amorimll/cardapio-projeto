@@ -15,7 +15,7 @@ Repositório criado para a minha API para o teste de desenvolvedor Node.js, da F
 
 ## Comandos
 
-Rodar a aplicação: `npm run start`
+Rodar a aplicação: `npm run start` <br/>
 Rodar os testes: `npm run test`
 
 ## Portas
