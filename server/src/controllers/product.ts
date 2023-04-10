@@ -22,7 +22,7 @@ export const getOneProduct = async (req: Request, res: Response) => {
   try {
     await check("id").notEmpty().isNumeric().withMessage("ID must be a number.").run(req);
 
-    const { id } = req.params;
+    const { id } = req.query;
     const product = await Product.findOne({ id });
     const errors = validationResult(req);
 
@@ -46,8 +46,14 @@ export const createProduct = async (req: Request, res: Response) => {
     const { categories, name, qty, price } = req.body;
     let productCategories: string[] = [];
     const errors = validationResult(req);
-    const maxId = await Product.find().sort({ id: 'desc' })
-    const id = Number(maxId[0].id) + 1
+    const maxId = await Product.aggregate([
+      { $addFields: { idInt: { $toInt: "$id" } } },
+      { $sort: { idInt: -1 } },
+      { $limit: 1 },
+      { $project: { maxId: "$idInt" } },
+    ]);
+
+    const id = maxId.length > 0 ? (Number(maxId[0].maxId) + 1) : 1;
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errorMessage: errors.array()[0].msg });
@@ -72,7 +78,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
     await product.save();
 
-    return res.status(201).send({ responseMessage: "Product successfully created." });
+    return res.status(201).send({ responseMessage: "Product successfully created.", product });
   } catch (err: any) {
     return res.status(400).send({ errorMessage: `Failed to create product, ${err.message}.` });
   }
@@ -126,7 +132,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
   try {
     await check("id").notEmpty().isNumeric().withMessage("ID must be a number.").run(req);
 
-    const { id } = req.params;
+    const { id } = req.query;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {

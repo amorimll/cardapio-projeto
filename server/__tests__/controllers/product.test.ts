@@ -46,7 +46,7 @@ afterAll(async () => {
   await disconnect();
 });
 
-describe("GET /products", () => {
+describe("GET /product", () => {
   it("should return a list of products", async () => {
     const res = await request(app)
       .get("/product")
@@ -57,10 +57,10 @@ describe("GET /products", () => {
   });
 });
 
-describe("GET /product/:id", () => {
+describe("GET /product:id", () => {
   it("should return a single product by ID", async () => {
     const res = await request(app)
-      .get("/product/999")
+      .get("/product?id=999")
       .set("Authorization", `Bearer ${token}`);
     expect(res.status).toBe(200);
     expect(typeof res.body).toBe("object");
@@ -68,25 +68,24 @@ describe("GET /product/:id", () => {
 
   it("should return an error if product is not found", async () => {
     const res = await request(app)
-      .get("/product/998")
+      .get("/product?id=998")
       .set("Authorization", `Bearer ${token}`);
     expect(res.status).toBe(404);
-    expect(res.body.errorMessage).toBe(`No product found`);
+    expect(res.body.errorMessage).toBe(`No product found.`);
   });
 
   it("should return an error if product id is not a number", async () => {
     const res = await request(app)
-      .get("/product/invalid-id")
+      .get("/product?id=invalid-id")
       .set("Authorization", `Bearer ${token}`);
     expect(res.status).toBe(400);
-    expect(res.body.errorMessage).toBe(`ID must be a number`);
+    expect(res.body.errorMessage).toBe(`ID must be a number.`);
   });
 });
 
-describe("POST /products", () => {
+describe("POST /product", () => {
   it("should create a new product", async () => {
     const productData = {
-      id: 100,
       categories: ["998", "999"],
       name: "New Product",
       qty: 10,
@@ -99,7 +98,7 @@ describe("POST /products", () => {
     expect(res.status).toBe(201);
     expect(res.body.responseMessage).toBe(`Product successfully created.`);
 
-    const createdProduct = await Product.findOne({ id: productData.id });
+    const createdProduct = await Product.findOne({ id: res.body.product.id});
     await Product.findByIdAndDelete(createdProduct);
   });
 
@@ -141,7 +140,7 @@ describe("PATCH /products/:id", () => {
       .patch(`/product/invalid-id`)
       .set("Authorization", `Bearer ${token}`);
     expect(res.status).toBe(400);
-    expect(res.body.errorMessage).toBe(`ID must be a number`);
+    expect(res.body.errorMessage).toBe(`ID must be a number.`);
   });
 
   it("should return an error if product is not found", async () => {
@@ -156,7 +155,7 @@ describe("PATCH /products/:id", () => {
       .set("Authorization", `Bearer ${token}`)
       .send(updatedProductData);
     expect(res.status).toBe(404);
-    expect(res.body.errorMessage).toBe(`No product found`);
+    expect(res.body.errorMessage).toBe(`No product found.`);
   });
 
   it("should return an error if categories are not found", async () => {
@@ -175,28 +174,28 @@ describe("PATCH /products/:id", () => {
   });
 });
 
-describe("DELETE /products/:id", () => {
+describe("DELETE /products:id", () => {
   it("should delete an existing product", async () => {
     const res = await request(app)
-      .delete(`/product/999`)
+      .delete(`/product?id=999`)
       .set("Authorization", `Bearer ${token}`);
     expect(res.status).toBe(200);
     expect(res.body.responseMessage).toBe(`Product successfully deleted.`);
   });
 
-  it("should return an error if product id is not a number", async () => {
-    const res = await request(app)
-      .delete(`/product/invalid-id`)
-      .set("Authorization", `Bearer ${token}`);
-    expect(res.status).toBe(400);
-    expect(res.body.errorMessage).toBe(`ID must be a number`);
-  });
-
   it("should return an error if product id is not found", async () => {
     const res = await request(app)
-      .delete(`/product/998`)
+      .delete(`/product?id=998`)
       .set("Authorization", `Bearer ${token}`);
     expect(res.status).toBe(404);
-    expect(res.body.errorMessage).toBe(`No product found`);
+    expect(res.body.errorMessage).toBe(`No product found.`);
+  });
+
+  it("should return an error if product id is not a number", async () => {
+    const res = await request(app)
+      .delete(`/product?id=invalid-id`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.status).toBe(400);
+    expect(res.body.errorMessage).toBe(`ID must be a number.`);
   });
 });
