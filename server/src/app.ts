@@ -14,3 +14,8 @@ app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/product", authMiddleware, productRoutes);
 app.use("/category", authMiddleware, categoryRoutes);
+
+app.use((req, res, next) => {
+  const error = new Error("Sorry, the requested resource could not be found.");
+  res.status(404).json({ errorMessage: error.message });
+});
