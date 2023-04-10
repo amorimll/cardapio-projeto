@@ -9,18 +9,18 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const products: ProductDocument[] = await Product.find();
 
     if (products.length < 1) {
-      return res.status(404).send({ errorMessage: "No products found" });
+      return res.status(404).send({ errorMessage: "No products found." });
     }
 
     return res.status(200).send(products);
   } catch (err: any) {
-    return res.status(400).send({ errorMessage: `Failed to get products, ${err.message}` });
+    return res.status(400).send({ errorMessage: `Failed to get products, ${err.message}.` });
   }
 };
 
 export const getOneProduct = async (req: Request, res: Response) => {
   try {
-    await check("id").notEmpty().isNumeric().withMessage("ID must be a number").run(req);
+    await check("id").notEmpty().isNumeric().withMessage("ID must be a number.").run(req);
 
     const { id } = req.params;
     const product = await Product.findOne({ id });
@@ -31,12 +31,12 @@ export const getOneProduct = async (req: Request, res: Response) => {
     }
 
     if (!product) {
-      return res.status(404).send({ errorMessage: "No product found" });
+      return res.status(404).send({ errorMessage: "No product found." });
     }
 
     return res.status(200).send(product);
   } catch (err: any) {
-    return res.status(400).send({ errorMessage: `Failed to get product, ${err.message}`});
+    return res.status(400).send({ errorMessage: `Failed to get product, ${err.message}.`});
   }
 };
 
@@ -78,7 +78,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    await check("id").notEmpty().isNumeric().withMessage("ID must be a number").run(req);
+    await check("id").notEmpty().isNumeric().withMessage("ID must be a number.").run(req);
 
     const { id } = req.params;
     const { categories, name, qty, price } = req.body;
@@ -111,18 +111,18 @@ export const updateProduct = async (req: Request, res: Response) => {
       );
 
     if (!updatedProduct) {
-      return res.status(404).send({ errorMessage: "No product found" });
+      return res.status(404).send({ errorMessage: "No product found." });
     }
 
     return res.status(201).send({ responseMessage: "Product successfully updated." });
   } catch (err: any) {
-    return res.status(400).send({ errorMessage: `Failed to update product, ${err.message}` });
+    return res.status(400).send({ errorMessage: `Failed to update product, ${err.message}.` });
   }
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    await check("id").notEmpty().isNumeric().withMessage("ID must be a number").run(req);
+    await check("id").notEmpty().isNumeric().withMessage("ID must be a number.").run(req);
 
     const { id } = req.params;
     const errors = validationResult(req);
@@ -134,7 +134,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
     const deletedProduct: ProductDocument | null = await Product.findOneAndDelete({ id });
 
     if (!deletedProduct) {
-      return res.status(404).send({ errorMessage: "No product found" });
+      return res.status(404).send({ errorMessage: "No product found." });
     }
 
     return res.status(200).send({ responseMessage: "Product successfully deleted." });
