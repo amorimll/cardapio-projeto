@@ -9,6 +9,6 @@ mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URL ?? "")
   .then(() => {
-    app.listen(PORT, () => console.log(`Servidor iniciado na porta ${PORT}.`));
+    app.listen(PORT, () => console.log(`Server started at ${PORT}.`));
   })
   .catch((error) => console.log(`${error}`));
