@@ -7,7 +7,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
     const category: CategoryDocument[] = await Category.find();
 
     if (category.length < 1) {
-      return res.status(404).send({ errorMessage: "No products found" });
+      return res.status(404).send({ errorMessage: "No categories found" });
     }
 
     return res.status(200).send(category);
