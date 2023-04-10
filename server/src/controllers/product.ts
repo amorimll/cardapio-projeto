@@ -43,9 +43,11 @@ export const getOneProduct = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { id, categories, name, qty, price } = req.body;
+    const { categories, name, qty, price } = req.body;
     let productCategories: string[] = [];
     const errors = validationResult(req);
+    const maxId = await Product.find().sort({ id: 'desc' })
+    const id = Number(maxId[0].id) + 1
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errorMessage: errors.array()[0].msg });
