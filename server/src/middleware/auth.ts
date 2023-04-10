@@ -1,13 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import dotenv from "dotenv";
+import { TokenPayload, UserRequest } from '../@types/middleware/IAuth';
 
-interface TokenPayload {
-  id: string;
-}
-
-interface UserRequest extends Request {
-  user?: TokenPayload;
-}
+dotenv.config()
 
 export const authMiddleware = (req: UserRequest, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -17,7 +13,7 @@ export const authMiddleware = (req: UserRequest, res: Response, next: NextFuncti
   }
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+    const verified = jwt.verify(token, process.env.JWT_SECRET ?? "") as TokenPayload;
 
     req.user = verified;
     next();

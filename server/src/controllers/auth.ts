@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
-interface TokenPayload {
-  role: string;
-}
+import { TokenPayload } from "../@types/controllers/IAuth";
 
 export const login = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -11,7 +8,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       role: "admin",
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET || "", {
+    const token = jwt.sign(payload, "CARDAPIOJWTPASS", {
       expiresIn: "1 day",
     });
 

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Product from "../models/Product";
 import Category from "../models/Category";
-import { ProductDocument } from "../@types/IProduct";
+import { ProductDocument } from "../@types/models/IProduct";
 import { check, validationResult } from "express-validator";
 
 export const getAllProducts = async (req: Request, res: Response) => {
@@ -20,11 +20,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
 export const getOneProduct = async (req: Request, res: Response) => {
   try {
-    await check("id").notEmpty().isNumeric().withMessage("ID must be number").run(req);
+    await check("id").notEmpty().isNumeric().withMessage("ID must be a number").run(req);
 
-    const errors = validationResult(req);
     const { id } = req.params;
     const product = await Product.findOne({ id });
+    const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).send({ errorMessage: errors.array()[0].msg });
@@ -40,11 +40,12 @@ export const getOneProduct = async (req: Request, res: Response) => {
   }
 };
 
+
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const errors = validationResult(req);
     const { id, categories, name, qty, price } = req.body;
     let productCategories: string[] = [];
+    const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errorMessage: errors.array()[0].msg });
@@ -69,7 +70,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
     await product.save();
 
-    return res.status(200).send({ responseMessage: "Product successfully created." });
+    return res.status(201).send({ responseMessage: "Product successfully created." });
   } catch (err: any) {
     return res.status(400).send({ errorMessage: `Failed to create product, ${err.message}.` });
   }
@@ -77,7 +78,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    await check("id").notEmpty().isNumeric().withMessage("ID must be number").run(req);
+    await check("id").notEmpty().isNumeric().withMessage("ID must be a number").run(req);
 
     const { id } = req.params;
     const { categories, name, qty, price } = req.body;
@@ -98,8 +99,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       }
     }
 
-    const updatedProduct: ProductDocument | null =
-      await Product.findOneAndUpdate(
+    const updatedProduct: ProductDocument | null = await Product.findOneAndUpdate(
         { id },
         {
           categories: productCategories,
@@ -114,7 +114,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(404).send({ errorMessage: "No product found" });
     }
 
-    return res.status(200).send({ responseMessage: "Product successfully updated." });
+    return res.status(201).send({ responseMessage: "Product successfully updated." });
   } catch (err: any) {
     return res.status(400).send({ errorMessage: `Failed to update product, ${err.message}` });
   }
@@ -122,17 +122,16 @@ export const updateProduct = async (req: Request, res: Response) => {
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    await check("id").notEmpty().isNumeric().withMessage("ID must be number").run(req);
+    await check("id").notEmpty().isNumeric().withMessage("ID must be a number").run(req);
 
-    const errors = validationResult(req);
     const { id } = req.params;
+    const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).send({ errorMessage: errors.array()[0].msg });
     }
 
-    const deletedProduct: ProductDocument | null =
-      await Product.findOneAndDelete({ id });
+    const deletedProduct: ProductDocument | null = await Product.findOneAndDelete({ id });
 
     if (!deletedProduct) {
       return res.status(404).send({ errorMessage: "No product found" });

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { CategoryDocument } from "../@types/ICategory";
+import { CategoryDocument } from "../@types/models/ICategory";
 
 const CategorySchema = new mongoose.Schema({
   id: {
@@ -8,7 +8,7 @@ const CategorySchema = new mongoose.Schema({
     unique: true,
   },
   parent: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "Category",
     default: null,
   },
